@@ -17,6 +17,8 @@ app.use(express.urlencoded({
     extended:true
 }))
 
+
+
 // trabalhar com Json
 app.use(express.json())
 
@@ -25,7 +27,20 @@ app.get("/cadastrar", (requisicao, resposta) =>{
 } )
 
 app.get('/', (requisicao, resposta) =>{
-    resposta.render("home")
+
+    const sql = 'SELECT * FROM  books'
+
+    conn.query(sql, (error, data) =>{
+        if(error){
+            return console.log(error)
+        }
+        const books = data
+        
+        console.log(books)
+
+        resposta.render("home", {books })
+    })
+    
 })
 
 app.post('/cadastrar/save', (requisicao, resposta) =>{
