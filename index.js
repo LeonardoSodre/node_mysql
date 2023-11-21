@@ -22,10 +22,29 @@ app.use(express.urlencoded({
 // trabalhar com Json
 app.use(express.json())
 
-app.get("/cadastrar", (requisicao, resposta) =>{
+app.get("/cadastrar", (request, response) =>{
     resposta.render("cadastrar")
 } )
 
+
+app.get("/edit/:id", (request, response) =>{
+    const id = request.params.id
+    
+    const sql = `
+    
+        SELECT * FROM books WHERE id = ${id}
+    `
+
+    conn.query(sql, (error, data)=>{
+        if(error){
+            return console.log(error)
+        }
+
+        const book = data[0]
+
+        response.render('edit', {book})
+    }) 
+})
 
 app.get("/book/:id", (request, response) =>{
     const id = request.params.id
@@ -43,7 +62,7 @@ app.get("/book/:id", (request, response) =>{
     })
 })
 
-app.get('/', (requisicao, resposta) =>{
+app.get('/', (request, response) =>{
 
     const sql = 'SELECT * FROM  books'
 
@@ -60,7 +79,20 @@ app.get('/', (requisicao, resposta) =>{
     
 })
 
-app.post('/cadastrar/save', (requisicao, resposta) =>{
+app.post("/edit/save", (request, response) =>{
+    const {id, title, pageqty} = request.body
+
+    const sql = `UPDATE books SET title = '${title}', pageqty = '${pageqty}' WHERE id = ${id}`
+
+    conn.query(sql, (error) =>{
+        if(error){
+            return console.log(error)
+        }
+        response.redirect("/")
+    })
+})
+
+app.post('/cadastrar/save', (request, response) =>{
 
     const {title, pageqty} = request.body
     const query = ` INSERT INTO books(title, pageqty)
